@@ -10,10 +10,22 @@ var FPS = 24;
 
 var STAGE_WIDTH, STAGE_HEIGHT;
 
+// question data
+var questions = [
+					{question:45, options:[5,2]},
+					{question:20, options:[5,2]}
+				];
+
 var questionCounter;
 var score;
 
 var gameStarted;
+
+// text
+var questionText;
+var scoreText;
+var leftVennText;
+var rightVennText;
 
 
 
@@ -43,7 +55,17 @@ function init() {
 function update(event) {
 
 	if (gameStarted) {
+		if (ndgmr.checkPixelCollision(square, leftVenn, 0) != null) {
+			console.log("left");
+		}
 
+		if (ndgmr.checkPixelCollision(square, centerVenn, 0) != null) {
+			console.log("center");
+		} 
+
+		if (ndgmr.checkPixelCollision(square, rightVenn, 0) != null) {
+			console.log("right");
+		}
 	}
 
 	stage.update(event);
@@ -67,6 +89,13 @@ function startGame() {
 }
 
 /*
+ * Updates and renders question and option text
+ */
+function nextQuestion() {
+
+}
+
+/*
  * Loads and positions graphics
  */
 function initGraphics() {
@@ -75,8 +104,75 @@ function initGraphics() {
 	// draw the venn diagram
 	leftVenn.x = rightVenn.x = centerVenn.x = STAGE_WIDTH/2 - leftVenn.image.width/2;
 	leftVenn.y = rightVenn.y = centerVenn.y = STAGE_HEIGHT/2 - leftVenn.image.height/2 + 20;
-
 	stage.addChild(leftVenn); stage.addChild(rightVenn); stage.addChild(centerVenn);
+
+	// init text
+	questionText = new createjs.Text(questions[questionCounter].question, '50px Lato', "black");
+	questionText.x = STAGE_WIDTH/2 - questionText.getMeasuredWidth()/2;
+	questionText.y = 5;
+	square.x = questionText.x;
+	square.y = questionText.y;
+	stage.addChild(square);
+	stage.addChild(questionText);
+	initTextListener();
+
+
+	scoreText = new createjs.Text("Score: " + score, '20px Lato', 'black');
+	scoreText.x = 5;
+	scoreText.y = STAGE_HEIGHT - scoreText.getMeasuredHeight() - 5;
+	stage.addChild(scoreText);
+
+	leftVennText = new createjs.Text(questions[questionCounter].options[0], '20px Lato', 'black');
+	leftVennText.x = STAGE_WIDTH/4;
+	leftVennText.y = STAGE_HEIGHT/2;
+	stage.addChild(leftVennText);
+
+	rightVennText = new createjs.Text(questions[questionCounter].options[1], '20px Lato', 'black');
+	rightVennText.x = STAGE_WIDTH/4 * 3;
+	rightVennText.y = STAGE_HEIGHT/2;
+	stage.addChild(rightVennText);
+}
+
+/*
+ * Set up the listener for the score text
+ */
+function initTextListener() {
+
+	square.on("pressmove", function(event) {
+		clickHandler(event);
+	});
+
+	square.on("click", function(event) {
+		dropHandler(event);
+	});
+
+	square.on("rollover", function(event) {
+		this.scaleX = this.scaleX * 1.2;
+		this.scaleY = this.scaleY * 1.2;
+	});
+
+	square.on("rollout", function(event) {
+		this.scaleX = 1;
+		this.scaleY = 1;
+	});
+}
+
+/*
+ * Allows the user to move the question text with mouse
+ */
+function clickHandler(event) {
+	event.target.x = event.stageX;
+	event.target.y = event.stageY;
+
+	questionText.x = square.x;
+	questionText.y = square.y;
+}
+
+/*
+ * The question text is dropped.
+ */
+function dropHandler(event) {
+	alert("dropped");
 }
 
 /*
@@ -87,8 +183,8 @@ function initMuteUnMuteButtons() {
 	hitArea.graphics.beginFill("#000").drawRect(0, 0, muteButton.image.width, muteButton.image.height);
 	muteButton.hitArea = unmuteButton.hitArea = hitArea;
 
-	muteButton.x = unmuteButton.x = 45;
-	muteButton.y = unmuteButton.y = 45;
+	muteButton.x = unmuteButton.x = 5;
+	muteButton.y = unmuteButton.y = 5;
 
 	muteButton.on("click", toggleMute);
 	unmuteButton.on("click", toggleMute);
@@ -103,6 +199,7 @@ function initMuteUnMuteButtons() {
 var startScreen;
 var leftVenn, centerVenn, rightVenn;
 var lifeHeart;
+var square;
 
 var muteButton, unmuteButton;
 
@@ -135,6 +232,10 @@ function setupManifest() {
 		{
 			src: "images/lifeHeart.png",
 			id: "lifeHeart"
+		},
+		{
+			src: "images/square.png",
+			id: "square"
 		}
 	];
 }
@@ -164,6 +265,8 @@ function handleFileLoad(event) {
    		rightVenn = new createjs.Bitmap(event.result);
    	} else if (event.item.id == "lifeHeart") {
    		lifeHeart = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "square") {
+   		square = new createjs.Bitmap(event.result);
    	}
 }
 
