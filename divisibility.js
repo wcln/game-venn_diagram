@@ -1,4 +1,8 @@
-
+/*
+ * BC Learning Network (bclearningnetwork.com)
+ * Divisibility Game
+ * @authors Colin Bernard and Brittany Miller
+ */
 
 
 var mute = false;
@@ -70,7 +74,7 @@ function initGraphics() {
 
 	// draw the venn diagram
 	leftVenn.x = rightVenn.x = centerVenn.x = STAGE_WIDTH/2 - leftVenn.image.width/2;
-	leftVenn.y = rightVenn.y = centerVenn.y = STAGE_HEIGHT/2;
+	leftVenn.y = rightVenn.y = centerVenn.y = STAGE_HEIGHT/2 - leftVenn.image.height/2 + 20;
 
 	stage.addChild(leftVenn); stage.addChild(rightVenn); stage.addChild(centerVenn);
 }
@@ -98,6 +102,7 @@ function initMuteUnMuteButtons() {
 // bitmap variables
 var startScreen;
 var leftVenn, centerVenn, rightVenn;
+var lifeHeart;
 
 var muteButton, unmuteButton;
 
@@ -126,6 +131,10 @@ function setupManifest() {
 		{
 			src: "images/centerVenn.png",
 			id: "centerVenn"
+		},
+		{
+			src: "images/lifeHeart.png",
+			id: "lifeHeart"
 		}
 	];
 }
@@ -153,6 +162,8 @@ function handleFileLoad(event) {
    		centerVenn = new createjs.Bitmap(event.result);
    	} else if (event.item.id == "rightVenn") {
    		rightVenn = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "lifeHeart") {
+   		lifeHeart = new createjs.Bitmap(event.result);
    	}
 }
 
