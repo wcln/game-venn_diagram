@@ -12,6 +12,7 @@ var score;
 var gameStarted;
 
 
+
 /*
  * Called by body onload
  */
@@ -65,20 +66,66 @@ function startGame() {
  * Loads and positions graphics
  */
 function initGraphics() {
+	initMuteUnMuteButtons();
 
+	// draw the venn diagram
+	leftVenn.x = rightVenn.x = centerVenn.x = STAGE_WIDTH/2 - leftVenn.image.width/2;
+	leftVenn.y = rightVenn.y = centerVenn.y = STAGE_HEIGHT/2;
+
+	stage.addChild(leftVenn); stage.addChild(rightVenn); stage.addChild(centerVenn);
+}
+
+/*
+ * Adds the mute and unmute buttons to the stage and defines listeners
+ */
+function initMuteUnMuteButtons() {
+	var hitArea = new createjs.Shape();
+	hitArea.graphics.beginFill("#000").drawRect(0, 0, muteButton.image.width, muteButton.image.height);
+	muteButton.hitArea = unmuteButton.hitArea = hitArea;
+
+	muteButton.x = unmuteButton.x = 45;
+	muteButton.y = unmuteButton.y = 45;
+
+	muteButton.on("click", toggleMute);
+	unmuteButton.on("click", toggleMute);
+
+	stage.addChild(muteButton);
 }
 
 
 ////////////////////////////////////////////////// PRE LOAD JS FUNCTIONS
 
 // bitmap variables
+var startScreen;
+var leftVenn, centerVenn, rightVenn;
 
+var muteButton, unmuteButton;
 
 function setupManifest() {
 	manifest = [
 		{
 			src: "sounds/click.mp3",
 			id: "click"
+		},
+		{
+			src: "images/mute.png",
+			id: "mute"
+		},
+		{
+			src: "images/unmute.png",
+			id: "unmute"
+		},
+		{
+			src: "images/rightVenn.png",
+			id: "rightVenn"
+		},
+		{
+			src: "images/leftVenn.png",
+			id: "leftVenn"
+		},
+		{
+			src: "images/centerVenn.png",
+			id: "centerVenn"
 		}
 	];
 }
@@ -96,8 +143,16 @@ function startPreload() {
 function handleFileLoad(event) {
 	console.log("A file has loaded of type: " + event.item.type);
     // create bitmaps of images
-   	if (event.item.id.includes("category")) {
-   		categories.push(new createjs.Bitmap(event.result));
+   	if (event.item.id == "mute") {
+   		muteButton = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "unmute") {
+   		unmuteButton = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "leftVenn") {
+   		leftVenn = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "centerVenn") {
+   		centerVenn = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "rightVenn") {
+   		rightVenn = new createjs.Bitmap(event.result);
    	}
 }
 
@@ -121,9 +176,6 @@ function loadComplete(event) {
 	createjs.Ticker.addEventListener("tick", update); // call update function
 
 
-
-
-	stage.addChild(background);
     stage.update();
     startGame();
 }

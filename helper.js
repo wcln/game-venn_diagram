@@ -2,7 +2,7 @@
 
  // HELPER FUNCTIONS
 
- /*
+/*
  * Toggles mute variable. Called from HTML button.
  */
 function toggleMute() {
@@ -14,9 +14,11 @@ function toggleMute() {
 	}
 
 	if (mute == true) {
-		document.getElementById("mute").firstElementChild.setAttribute("src", "images/mute.png");
+		stage.addChild(unmuteButton);
+		stage.removeChild(muteButton);
 	} else {
-		document.getElementById("mute").firstElementChild.setAttribute("src", "images/unmute.png");
+		stage.addChild(muteButton);
+		stage.removeChild(unmuteButton);
 	}
 }
 
