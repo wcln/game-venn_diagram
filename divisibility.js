@@ -13,7 +13,10 @@ var STAGE_WIDTH, STAGE_HEIGHT;
 // question data
 var questions = [
 					{question:45, options:[5,2]},
-					{question:20, options:[5,2]}
+					{question:20, options:[5,2]},
+					{question:4, options:[2,3]},
+					{question:5, options:[3,2]},
+					{question:7, options:[7,1]}
 				];
 
 var questionCounter;
@@ -21,11 +24,18 @@ var score;
 
 var gameStarted;
 
+var selected = "none";
+var enabled = false; // keep track of whether square is being dragged
+
+var hearts;
+var lifeIndex = 2;
+
 // text
 var questionText;
 var scoreText;
 var leftVennText;
 var rightVennText;
+
 
 
 
@@ -55,17 +65,7 @@ function init() {
 function update(event) {
 
 	if (gameStarted) {
-		if (ndgmr.checkPixelCollision(square, leftVenn, 0) != null) {
-			console.log("left");
-		}
 
-		if (ndgmr.checkPixelCollision(square, centerVenn, 0) != null) {
-			console.log("center");
-		} 
-
-		if (ndgmr.checkPixelCollision(square, rightVenn, 0) != null) {
-			console.log("right");
-		}
 	}
 
 	stage.update(event);
@@ -76,6 +76,11 @@ function update(event) {
  */
 function endGame() {
 	gameStarted = false;
+
+	stage.addChild(gameOverSplash);
+	stage.on("stagemousedown", function() {
+		location.reload();
+	});
 }
 
 /*
@@ -93,6 +98,24 @@ function startGame() {
  */
 function nextQuestion() {
 
+	if (gameStarted) {
+		selected = "none";
+		questionCounter++;
+
+		if (questionCounter == questions.length) {
+			endGame();
+		} else {
+			square.x = 45;
+			square.y = 100;
+
+			questionText.text = questions[questionCounter].question;
+			leftVennText.text = questions[questionCounter].options[0];
+			rightVennText.text = questions[questionCounter].options[1];
+
+			questionText.x = square.x + square.image.width/2 - questionText.getMeasuredWidth()/2;
+			questionText.y = square.y + square.image.height/2 - questionText.getMeasuredHeight()/2;
+		}
+	}
 }
 
 /*
@@ -105,74 +128,224 @@ function initGraphics() {
 	leftVenn.x = rightVenn.x = centerVenn.x = STAGE_WIDTH/2 - leftVenn.image.width/2;
 	leftVenn.y = rightVenn.y = centerVenn.y = STAGE_HEIGHT/2 - leftVenn.image.height/2 + 20;
 	stage.addChild(leftVenn); stage.addChild(rightVenn); stage.addChild(centerVenn);
+	initVennListeners();
 
 	// init text
-	questionText = new createjs.Text(questions[questionCounter].question, '50px Lato', "black");
-	questionText.x = STAGE_WIDTH/2 - questionText.getMeasuredWidth()/2;
-	questionText.y = 5;
-	square.x = questionText.x;
-	square.y = questionText.y;
+	questionText = new createjs.Text(questions[questionCounter].question, '36px Lato', "black");
+	square.x = 45;
+	square.y = 100;
+	questionText.x = square.x + square.image.width/2 - questionText.getMeasuredWidth()/2;
+	questionText.y = square.y + square.image.height/2 - questionText.getMeasuredHeight()/2;
 	stage.addChild(square);
 	stage.addChild(questionText);
-	initTextListener();
+	initQuestionListener();
+
+	recycle.x = 20;
+	recycle.y = 365;
+	stage.addChild(recycle);
+	initRecycleListener();
 
 
-	scoreText = new createjs.Text("Score: " + score, '20px Lato', 'black');
-	scoreText.x = 5;
-	scoreText.y = STAGE_HEIGHT - scoreText.getMeasuredHeight() - 5;
+	scoreText = new createjs.Text(score, '30px Lato', 'black');
+	scoreText.x = 395 - scoreText.getMeasuredWidth()/2;
+	scoreText.y = 455 - scoreText.getMeasuredHeight()/2;
 	stage.addChild(scoreText);
 
-	leftVennText = new createjs.Text(questions[questionCounter].options[0], '20px Lato', 'black');
-	leftVennText.x = STAGE_WIDTH/4;
+	leftVennText = new createjs.Text(questions[questionCounter].options[0], '32px Lato', 'black');
+	leftVennText.x = STAGE_WIDTH/2 - 80 - leftVennText.getMeasuredWidth();
 	leftVennText.y = STAGE_HEIGHT/2;
 	stage.addChild(leftVennText);
 
-	rightVennText = new createjs.Text(questions[questionCounter].options[1], '20px Lato', 'black');
-	rightVennText.x = STAGE_WIDTH/4 * 3;
+	rightVennText = new createjs.Text(questions[questionCounter].options[1], '32px Lato', 'black');
+	rightVennText.x = STAGE_WIDTH/2 + 80;
 	rightVennText.y = STAGE_HEIGHT/2;
 	stage.addChild(rightVennText);
+
+	correctSplash.scaleX = correctSplash.scaleY = 0.7;
+	wrongSplash.scaleX = wrongSplash.scaleY = 0.7;
+	gameOverSplash.scaleX = gameOverSplash.scaleY = 0.7;
+
+	hearts = [];
+	for (var i = 0; i < 3; i++) {
+		hearts[i] = Object.create(life);
+		hearts[i].x = 530 + 40 * i - life.image.width/2;
+		hearts[i].y = 450 - life.image.height/2;
+		stage.addChild(hearts[i]);
+	}
+}
+
+function initRecycleListener() {
+	recycle.on("rollover", function(event) {
+		if (enabled) {
+			recycle.alpha = 0.8;
+			recycle.scaleX = recycle.scaleY = 1.05;
+			selected = "recycle";
+		}
+	});
+	recycle.on("rollout", function(event) {
+		recycle.alpha = 1;
+		recycle.scaleX = recycle.scaleY = 1;
+		selected = "none";
+	
+	});
 }
 
 /*
- * Set up the listener for the score text
+ * Set up the listener for the question text and square
  */
-function initTextListener() {
+function initQuestionListener() {
 
 	square.on("pressmove", function(event) {
-		clickHandler(event);
+		enabled = true;
+		moveHandler(event);
 	});
 
-	square.on("click", function(event) {
-		dropHandler(event);
+	stage.on("stagemouseup", function(event) {
+		if (enabled) {
+			dropHandler(event);
+		}
 	});
 
 	square.on("rollover", function(event) {
-		this.scaleX = this.scaleX * 1.2;
-		this.scaleY = this.scaleY * 1.2;
+		this.scaleX = this.scaleX * 1.1;
+		this.scaleY = this.scaleY * 1.1;
+		questionText.scaleX = 1.1;
+		questionText.scaleY = 1.1;
 	});
 
 	square.on("rollout", function(event) {
 		this.scaleX = 1;
 		this.scaleY = 1;
+		questionText.scaleX = questionText.scaleY = 1;
 	});
 }
+
+function initVennListeners() {
+	leftVenn.on("rollover", function() {
+		if (enabled) {
+			leftVenn.alpha = 0.8;
+			selected = "left";
+		}
+	});
+	leftVenn.on("rollout", function() {
+
+		leftVenn.alpha = 1;
+		selected = "none";
+		
+	});
+	centerVenn.on("rollover", function() {
+		if (enabled) {
+			centerVenn.alpha = 0.8;
+			selected = "both";
+		}
+	});
+	centerVenn.on("rollout", function() {
+
+		centerVenn.alpha = 1;
+		selected = "none";
+		
+	});
+	rightVenn.on("rollover", function() {
+		if (enabled) {
+			rightVenn.alpha = 0.8;
+			selected = "right";
+		}
+	});
+	rightVenn.on("rollout", function() {
+			
+		rightVenn.alpha = 1;
+		selected = "none";
+		
+	});
+}
+
 
 /*
  * Allows the user to move the question text with mouse
  */
-function clickHandler(event) {
-	event.target.x = event.stageX;
-	event.target.y = event.stageY;
+function moveHandler(event) {
 
-	questionText.x = square.x;
-	questionText.y = square.y;
+	stage.setChildIndex(square, 1);
+
+	event.target.x = event.stageX - square.image.width/2;
+	event.target.y = event.stageY - square.image.height/2;
+
+	questionText.x = square.x + square.image.width/2 - questionText.getMeasuredWidth()/2;
+	questionText.y = square.y + square.image.height/2 - questionText.getMeasuredHeight()/2;
+
 }
 
 /*
  * The question text is dropped.
  */
 function dropHandler(event) {
-	alert("dropped");
+	enabled = false;
+
+	if (selected != "none") {
+		// determine correct answer
+		var correct;
+		let number = questions[questionCounter].question;
+		let left = questions[questionCounter].options[0];
+		let right = questions[questionCounter].options[1];
+
+		if (number % left == 0 && number % right == 0) {
+			correct = "both";
+		} else if (number % left == 0) {
+			correct = "left";
+		} else if (number % right == 0) {
+			correct = "right";
+		} else {
+			correct = "recycle";
+		}
+
+		if (selected === correct) {
+			showCorrectSplash();
+			updateScore(10);
+		} else {
+			showWrongSplash();
+			updateScore(-5);
+			removeLife();
+
+		}
+	} 
+}
+
+function removeLife() {
+
+	createjs.Tween.get(hearts[lifeIndex]).to({alpha:0}, 200).call(function() {
+		stage.removeChild(hearts[lifeIndex]);
+		lifeIndex--;
+
+		if (lifeIndex == -1) {
+			setTimeout(endGame, 800);
+		}
+	});
+}
+
+function updateScore(value) {
+	scoreText.text = parseInt(scoreText.text) + value;
+	scoreText.x = 395 - scoreText.getMeasuredWidth()/2;
+	scoreText.y = 455 - scoreText.getMeasuredHeight()/2;
+}
+
+function showCorrectSplash() {
+	correctSplash.alpha = 1;
+	stage.addChild(correctSplash);
+
+	createjs.Tween.get(correctSplash).to({alpha:0}, 1000).call(function() {
+		stage.removeChild(correctSplash);
+		nextQuestion();
+	})
+}
+
+function showWrongSplash() {
+	wrongSplash.alpha = 1;
+	stage.addChild(wrongSplash);
+
+	createjs.Tween.get(wrongSplash).to({alpha:0}, 1000).call(function() {
+		stage.removeChild(wrongSplash);
+		nextQuestion();
+	})
 }
 
 /*
@@ -198,8 +371,11 @@ function initMuteUnMuteButtons() {
 // bitmap variables
 var startScreen;
 var leftVenn, centerVenn, rightVenn;
-var lifeHeart;
+var life;
 var square;
+var background;
+var recycle;
+var correctSplash, wrongSplash, gameOverSplash;
 
 var muteButton, unmuteButton;
 
@@ -230,12 +406,32 @@ function setupManifest() {
 			id: "centerVenn"
 		},
 		{
-			src: "images/lifeHeart.png",
-			id: "lifeHeart"
+			src: "images/life.png",
+			id: "life"
 		},
 		{
 			src: "images/square.png",
 			id: "square"
+		},
+		{
+			src: "images/background.png",
+			id: "background"
+		},
+		{
+			src: "images/recycle.png",
+			id: "recycle"
+		},
+		{
+			src: "images/right.png",
+			id: "correct"
+		},
+		{
+			src: "images/wrong.png",
+			id: "wrong"
+		},
+		{
+			src: "images/gameOver.png",
+			id: "gameOver"
 		}
 	];
 }
@@ -263,10 +459,20 @@ function handleFileLoad(event) {
    		centerVenn = new createjs.Bitmap(event.result);
    	} else if (event.item.id == "rightVenn") {
    		rightVenn = new createjs.Bitmap(event.result);
-   	} else if (event.item.id == "lifeHeart") {
-   		lifeHeart = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "life") {
+   		life = new createjs.Bitmap(event.result);
    	} else if (event.item.id == "square") {
    		square = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "background") {
+   		background = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "recycle") {
+   		recycle = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "correct") {
+   		correctSplash = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "wrong") {
+   		wrongSplash = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "gameOver") {
+   		gameOverSplash = new createjs.Bitmap(event.result);
    	}
 }
 
@@ -289,7 +495,7 @@ function loadComplete(event) {
 	createjs.Ticker.setFPS(FPS);
 	createjs.Ticker.addEventListener("tick", update); // call update function
 
-
+	stage.addChild(background);
     stage.update();
     startGame();
 }
