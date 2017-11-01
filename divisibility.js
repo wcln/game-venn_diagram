@@ -131,7 +131,7 @@ function initGraphics() {
 	initVennListeners();
 
 	// init text
-	questionText = new createjs.Text(questions[questionCounter].question, '36px Lato', "black");
+	questionText = new createjs.Text(questions[questionCounter].question, '36px Arial', "black");
 	square.x = 45;
 	square.y = 100;
 	questionText.x = square.x + square.image.width/2 - questionText.getMeasuredWidth()/2;
@@ -146,17 +146,18 @@ function initGraphics() {
 	initRecycleListener();
 
 
-	scoreText = new createjs.Text(score, '30px Lato', 'black');
+	scoreText = new createjs.Text(score, '30px Arial', 'black');
 	scoreText.x = 395 - scoreText.getMeasuredWidth()/2;
 	scoreText.y = 455 - scoreText.getMeasuredHeight()/2;
 	stage.addChild(scoreText);
+	console.log(scoreText.y);
 
-	leftVennText = new createjs.Text(questions[questionCounter].options[0], '32px Lato', 'black');
+	leftVennText = new createjs.Text(questions[questionCounter].options[0], '32px Arial', 'black');
 	leftVennText.x = STAGE_WIDTH/2 - 80 - leftVennText.getMeasuredWidth();
 	leftVennText.y = STAGE_HEIGHT/2;
 	stage.addChild(leftVennText);
 
-	rightVennText = new createjs.Text(questions[questionCounter].options[1], '32px Lato', 'black');
+	rightVennText = new createjs.Text(questions[questionCounter].options[1], '32px Arial', 'black');
 	rightVennText.x = STAGE_WIDTH/2 + 80;
 	rightVennText.y = STAGE_HEIGHT/2;
 	stage.addChild(rightVennText);
