@@ -16,11 +16,21 @@ var questions = [
 					{question:20, options:[5,2]},
 					{question:4, options:[2,3]},
 					{question:5, options:[3,2]},
-					{question:7, options:[7,1]}
+					{question:7, options:[7,1]},
+					{question:11, options:[7, 10]},
+					{question:9, options:[6,3]},
+					{question:24, options:[3,6]},
+					{question:32, options:[9,3]},
+					{question:128, options:[2,16]}
 				];
 
 var questionCounter;
+var levelCounter;
 var score;
+var timeToAnswer = 10; // seconds
+var lastTime = 0;
+var questionTimer;
+var timerCounter;
 
 var gameStarted;
 
@@ -35,6 +45,8 @@ var questionText;
 var scoreText;
 var leftVennText;
 var rightVennText;
+var levelText;
+var timerText;
 
 
 
@@ -56,6 +68,7 @@ function init() {
 
 	score = 0; // reset game score
 	questionCounter = 0;
+	levelCounter = 1;
 	stage.update();
 }
 
@@ -71,11 +84,30 @@ function update(event) {
 	stage.update(event);
 }
 
+function timer() {
+	timerCounter--;
+	timerText.text = timerCounter;
+	timerText.x = 467 - timerText.getMeasuredWidth()/2;
+	timerText.y = 450 - timerText.getMeasuredHeight()/2;
+
+	if (timerCounter == 0) {
+		showWrongSplash();
+		updateScore(-5);
+		removeLife();
+		playSound("wrongSound");
+		clearInterval(questionTimer);
+	}
+}
+
 /*
  * Ends the game
  */
 function endGame() {
 	gameStarted = false;
+
+
+	playSound("timeout");
+	clearInterval(questionTimer);
 
 	stage.addChild(gameOverSplash);
 	stage.on("stagemousedown", function() {
@@ -91,6 +123,8 @@ function startGame() {
 	initGraphics();
 
 	gameStarted = true;
+	timerCounter = timeToAnswer;
+	questionTimer = setInterval(timer, 1000);
 }
 
 /*
@@ -114,6 +148,10 @@ function nextQuestion() {
 
 			questionText.x = square.x + square.image.width/2 - questionText.getMeasuredWidth()/2;
 			questionText.y = square.y + square.image.height/2 - questionText.getMeasuredHeight()/2;
+
+			timerCounter = timeToAnswer + 1;
+			questionTimer = setInterval(timer, 1000);
+
 		}
 	}
 }
@@ -148,9 +186,8 @@ function initGraphics() {
 
 	scoreText = new createjs.Text(score, '30px Arial', 'black');
 	scoreText.x = 395 - scoreText.getMeasuredWidth()/2;
-	scoreText.y = 455 - scoreText.getMeasuredHeight()/2;
+	scoreText.y = 450 - scoreText.getMeasuredHeight()/2;
 	stage.addChild(scoreText);
-	console.log(scoreText.y);
 
 	leftVennText = new createjs.Text(questions[questionCounter].options[0], '32px Arial', 'black');
 	leftVennText.x = STAGE_WIDTH/2 - 80 - leftVennText.getMeasuredWidth();
@@ -173,6 +210,16 @@ function initGraphics() {
 		hearts[i].y = 450 - life.image.height/2;
 		stage.addChild(hearts[i]);
 	}
+
+	levelText = new createjs.Text(levelCounter, '30px Arial', 'black');
+	levelText.x = 320 - levelText.getMeasuredWidth()/2;
+	levelText.y = 450 - levelText.getMeasuredHeight()/2;
+	stage.addChild(levelText);
+
+	timerText = new createjs.Text(timeToAnswer, '30px Arial', 'black');
+	timerText.x = 467 - timerText.getMeasuredWidth()/2;
+	timerText.y = 450 - timerText.getMeasuredHeight()/2;
+	stage.addChild(timerText);
 }
 
 function initRecycleListener() {
@@ -283,6 +330,9 @@ function dropHandler(event) {
 	enabled = false;
 
 	if (selected != "none") {
+		clearInterval(questionTimer);
+
+
 		// determine correct answer
 		var correct;
 		let number = questions[questionCounter].question;
@@ -300,13 +350,19 @@ function dropHandler(event) {
 		}
 
 		if (selected === correct) {
+
+			if (questionCounter == 4  || questionCounter == 8) {
+				nextLevel();
+			}
+
 			showCorrectSplash();
 			updateScore(10);
+			playSound("correctSound");
 		} else {
 			showWrongSplash();
 			updateScore(-5);
 			removeLife();
-
+			playSound("wrongSound");
 		}
 	} 
 }
@@ -323,10 +379,19 @@ function removeLife() {
 	});
 }
 
+function nextLevel() {
+	levelCounter++;
+	levelText.text = levelCounter;
+	levelText.x = 320 - levelText.getMeasuredWidth()/2;
+	levelText.y = 450 - levelText.getMeasuredHeight()/2;
+
+	timeToAnswer -= 2;
+}
+
 function updateScore(value) {
 	scoreText.text = parseInt(scoreText.text) + value;
 	scoreText.x = 395 - scoreText.getMeasuredWidth()/2;
-	scoreText.y = 455 - scoreText.getMeasuredHeight()/2;
+	scoreText.y = 450 - scoreText.getMeasuredHeight()/2;
 }
 
 function showCorrectSplash() {
@@ -433,6 +498,18 @@ function setupManifest() {
 		{
 			src: "images/gameOver.png",
 			id: "gameOver"
+		},
+		{
+			src: "sounds/correct.wav",
+			id: "correctSound"
+		},
+		{
+			src: "sounds/wrong.wav",
+			id: "wrongSound"
+		},
+		{
+			src: "sounds/timeout.wav",
+			id: "timeout"
 		}
 	];
 }
