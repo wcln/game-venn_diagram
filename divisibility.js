@@ -12,16 +12,36 @@ var STAGE_WIDTH, STAGE_HEIGHT;
 
 // question data
 var questions = [
-					{question:45, options:[5,2]},
-					{question:20, options:[5,2]},
-					{question:4, options:[2,3]},
-					{question:5, options:[3,2]},
-					{question:7, options:[7,1]},
-					{question:11, options:[7, 10]},
-					{question:9, options:[6,3]},
-					{question:24, options:[3,6]},
-					{question:32, options:[9,3]},
-					{question:128, options:[2,16]}
+					{question:6, options:[4,3]},
+					{question:5, options:[2,1]},
+					{question:16, options:[6,4]},
+					{question:35, options:[7,5]},
+					{question:15, options:[3,5]},
+					{question:22, options:[11,4]},
+					{question:23, options:[7,3]},
+					{question:10, options:[1,2]},
+					{question:25, options:[5,4]},
+					{question:13, options:[3,10]},
+					{question:20, options:[4,2]},
+					{question:30, options:[5,8]},
+					{question:22, options:[2,8]},
+					{question:44, options:[11,6]},
+					{question:60, options:[20,4]},
+					{question:18, options:[9,6]},
+					{question:45, options:[15,17]},
+					{question:51, options:[4,7]},
+					{question:71, options:[7,10]},
+					{question:32, options:[4,6]},
+					{question:54, options:[9,4]},
+					{question:42, options:[6,3]},
+					{question:60, options:[12,8]},
+					{question:28, options:[7,6]},
+					{question:62, options:[4,12]},
+					{question:121, options:[11,12]},
+					{question:1000, options:[4,205]},
+					{question:52, options:[4,13]},
+					{question:144, options:[12,4]},
+					{question:89, options:[9,13]}
 				];
 
 var questionCounter;
