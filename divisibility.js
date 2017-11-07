@@ -129,8 +129,24 @@ function endGame() {
 	playSound("timeout");
 	clearInterval(questionTimer);
 
+	playAgainButton.x = playAgainButtonHover.x = STAGE_WIDTH/2 - 20;
+	playAgainButton.y = playAgainButtonHover.y = STAGE_HEIGHT/2 - 60;
+	gameOverSplash.x = -20;
+	gameOverSplash.y = -10;
 	stage.addChild(gameOverSplash);
+	stage.addChild(playAgainButton);
+
+
+	playAgainButton.on("mouseover", function() {
+		stage.addChild(playAgainButtonHover);
+		stage.removeChild(playAgainButton);
+	});
+	playAgainButtonHover.on("mouseout", function() {
+		stage.addChild(playAgainButton);
+		stage.removeChild(playAgainButtonHover);
+	})
 	stage.on("stagemousedown", function() {
+		playSound("click");
 		location.reload();
 	});
 }
@@ -140,11 +156,31 @@ function endGame() {
  */
 function startGame() {
 
-	initGraphics();
+	startButton.x = startButtonHover.x  = STAGE_WIDTH/2 - startButton.image.width/2;
+	startButton.y = startButtonHover.y = STAGE_HEIGHT/2 - startButton.image.height/2;
 
-	gameStarted = true;
-	timerCounter = timeToAnswer;
-	questionTimer = setInterval(timer, 1000);
+	stage.addChild(startButton);
+	startButton.on("mouseover", function() {
+		if (!gameStarted) {
+			stage.addChild(startButtonHover);
+			stage.removeChild(startButton);
+		}
+	});
+	startButtonHover.on("mouseout", function() {
+		if (!gameStarted) {
+			stage.addChild(startButton);
+			stage.removeChild(startButtonHover);
+		}
+	});
+	startButtonHover.on("mousedown", function() {
+		playSound("click");
+		stage.removeChild(startButtonHover);
+		initGraphics();
+		gameStarted = true;
+		timerCounter = timeToAnswer;
+		questionTimer = setInterval(timer, 1000);
+	});
+
 }
 
 /*
@@ -218,10 +254,6 @@ function initGraphics() {
 	rightVennText.x = STAGE_WIDTH/2 + 80;
 	rightVennText.y = STAGE_HEIGHT/2;
 	stage.addChild(rightVennText);
-
-	correctSplash.scaleX = correctSplash.scaleY = 0.7;
-	wrongSplash.scaleX = wrongSplash.scaleY = 0.7;
-	gameOverSplash.scaleX = gameOverSplash.scaleY = 0.7;
 
 	hearts = [];
 	for (var i = 0; i < 3; i++) {
@@ -463,6 +495,8 @@ var background;
 var recycle;
 var correctSplash, wrongSplash, gameOverSplash;
 
+var startButton, startButtonHover, playAgainButton, playAgainButtonHover;
+
 var muteButton, unmuteButton;
 
 function setupManifest() {
@@ -530,6 +564,22 @@ function setupManifest() {
 		{
 			src: "sounds/timeout.wav",
 			id: "timeout"
+		},
+		{
+			src: "images/playAgainButton.png",
+			id: "playAgainButton"
+		},
+		{
+			src: "images/playAgainButtonHover.png",
+			id: "playAgainButtonHover"
+		},
+		{
+			src: "images/start.png",
+			id: "startButton"
+		},
+		{
+			src: "images/startHover.png",
+			id: "startButtonHover"
 		}
 	];
 }
@@ -571,6 +621,14 @@ function handleFileLoad(event) {
    		wrongSplash = new createjs.Bitmap(event.result);
    	} else if (event.item.id == "gameOver") {
    		gameOverSplash = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "startButton") {
+   		startButton = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "startButtonHover") {
+   		startButtonHover = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "playAgainButton") {
+   		playAgainButton = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "playAgainButtonHover") {
+   		playAgainButtonHover = new createjs.Bitmap(event.result);
    	}
 }
 
