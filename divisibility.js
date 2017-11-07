@@ -109,6 +109,7 @@ function timer() {
 	timerText.text = timerCounter;
 	timerText.x = 467 - timerText.getMeasuredWidth()/2;
 	timerText.y = 450 - timerText.getMeasuredHeight()/2;
+	playSound("tick");
 
 	if (timerCounter == 0) {
 		showWrongSplash();
@@ -504,6 +505,10 @@ function setupManifest() {
 		{
 			src: "sounds/click.mp3",
 			id: "click"
+		},
+		{
+			src: "sounds/tick.mp3",
+			id: "tick"
 		},
 		{
 			src: "images/mute.png",
