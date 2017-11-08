@@ -130,10 +130,12 @@ function endGame() {
 	playSound("timeout");
 	clearInterval(questionTimer);
 
+	stage.addChild(faded);
+
 	playAgainButton.x = playAgainButtonHover.x = STAGE_WIDTH/2 - 20;
 	playAgainButton.y = playAgainButtonHover.y = STAGE_HEIGHT/2 - 60;
-	gameOverSplash.x = -20;
-	gameOverSplash.y = -10;
+	gameOverSplash.x = 20;
+	gameOverSplash.y = 10;
 	stage.addChild(gameOverSplash);
 	stage.addChild(playAgainButton);
 
@@ -158,7 +160,7 @@ function endGame() {
 function startGame() {
 
 	startButton.x = startButtonHover.x  = STAGE_WIDTH/2 - startButton.image.width/2;
-	startButton.y = startButtonHover.y = STAGE_HEIGHT/2 - startButton.image.height/2;
+	startButton.y = startButtonHover.y = 350;
 
 	stage.addChild(startButton);
 	startButton.on("mouseover", function() {
@@ -217,6 +219,8 @@ function nextQuestion() {
  * Loads and positions graphics
  */
 function initGraphics() {
+	stage.addChild(background);
+	stage.removeChild(startBackground);
 	initMuteUnMuteButtons();
 
 	// draw the venn diagram
@@ -404,7 +408,7 @@ function dropHandler(event) {
 
 		if (selected === correct) {
 
-			if (questionCounter == 4  || questionCounter == 8) {
+			if (questionCounter == 10  || questionCounter == 20) {
 				nextLevel();
 			}
 
@@ -488,13 +492,13 @@ function initMuteUnMuteButtons() {
 ////////////////////////////////////////////////// PRE LOAD JS FUNCTIONS
 
 // bitmap variables
-var startScreen;
 var leftVenn, centerVenn, rightVenn;
 var life;
 var square;
-var background;
+var background, startBackground;
 var recycle;
 var correctSplash, wrongSplash, gameOverSplash;
+var faded;
 
 var startButton, startButtonHover, playAgainButton, playAgainButtonHover;
 
@@ -585,6 +589,14 @@ function setupManifest() {
 		{
 			src: "images/startHover.png",
 			id: "startButtonHover"
+		},
+		{
+			src: "images/startBackground.png",
+			id: "startBackground"
+		},
+		{
+			src: "images/faded.png",
+			id: "faded"
 		}
 	];
 }
@@ -634,6 +646,10 @@ function handleFileLoad(event) {
    		playAgainButton = new createjs.Bitmap(event.result);
    	} else if (event.item.id == "playAgainButtonHover") {
    		playAgainButtonHover = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "startBackground") {
+   		startBackground = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "faded") {
+   		faded = new createjs.Bitmap(event.result);
    	}
 }
 
@@ -656,7 +672,7 @@ function loadComplete(event) {
 	createjs.Ticker.setFPS(FPS);
 	createjs.Ticker.addEventListener("tick", update); // call update function
 
-	stage.addChild(background);
+	stage.addChild(startBackground);
     stage.update();
     startGame();
 }
