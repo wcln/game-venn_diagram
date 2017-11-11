@@ -12,36 +12,36 @@ var STAGE_WIDTH, STAGE_HEIGHT;
 
 // question data
 var questions = [
-					{question:6, options:[4,3]},
-					{question:5, options:[2,1]},
-					{question:16, options:[6,4]},
-					{question:35, options:[7,5]},
-					{question:15, options:[3,5]},
-					{question:22, options:[11,4]},
-					{question:23, options:[7,3]},
-					{question:10, options:[1,2]},
-					{question:25, options:[5,4]},
-					{question:13, options:[3,10]},
-					{question:20, options:[4,2]},
-					{question:30, options:[5,8]},
-					{question:22, options:[2,8]},
-					{question:44, options:[11,6]},
-					{question:60, options:[20,4]},
-					{question:18, options:[9,6]},
-					{question:45, options:[15,17]},
-					{question:51, options:[4,7]},
-					{question:71, options:[7,10]},
-					{question:32, options:[4,6]},
-					{question:54, options:[9,4]},
-					{question:42, options:[6,3]},
-					{question:60, options:[12,8]},
-					{question:28, options:[7,6]},
-					{question:62, options:[4,12]},
-					{question:121, options:[11,12]},
-					{question:1000, options:[4,205]},
-					{question:52, options:[4,13]},
-					{question:144, options:[12,4]},
-					{question:89, options:[9,13]}
+					{question:6, options:[4,3], answer:"right"},
+					{question:5, options:[2,1], answer:"right"},
+					{question:16, options:[6,4], answer:"right"},
+					{question:35, options:[7,5], answer:"both"},
+					{question:15, options:[3,5], answer:"both"},
+					{question:22, options:[11,4], answer:"left"},
+					{question:23, options:[7,3], answer:"neither"},
+					{question:10, options:[1,2], answer:"both"},
+					{question:25, options:[5,4], answer:"left"},
+					{question:13, options:[3,10], answer:"neither"},
+					{question:20, options:[4,2], answer:"both"},
+					{question:30, options:[5,8], answer:"left"},
+					{question:22, options:[2,8], answer:"left"},
+					{question:44, options:[11,6], answer:"left"},
+					{question:60, options:[20,4], answer:"both"},
+					{question:18, options:[9,6], answer:"both"},
+					{question:45, options:[15,17], answer:"left"},
+					{question:51, options:[4,7], answer:"neither"},
+					{question:71, options:[7,10], answer:"neither"},
+					{question:32, options:[4,6], answer:"left"},
+					{question:54, options:[9,4], answer:"left"},
+					{question:42, options:[6,3], answer:"both"},
+					{question:60, options:[12,8], answer:"left"},
+					{question:28, options:[7,6], answer:"left"},
+					{question:62, options:[4,12], answer:"neither"},
+					{question:121, options:[11,12], answer:"left"},
+					{question:1000, options:[4,205], answer:"left"},
+					{question:52, options:[4,13], answer:"both"},
+					{question:144, options:[12,4], answer:"both"},
+					{question:89, options:[9,13], answer:"neither"}
 				];
 
 var questionCounter;
@@ -136,6 +136,7 @@ function endGame() {
 	playAgainButton.y = playAgainButtonHover.y = STAGE_HEIGHT/2 - 60;
 	gameOverSplash.x = 20;
 	gameOverSplash.y = 10;
+	playAgainButtonHover.cursor = "pointer";
 	stage.addChild(gameOverSplash);
 	stage.addChild(playAgainButton);
 
@@ -161,6 +162,8 @@ function startGame() {
 
 	startButton.x = startButtonHover.x  = STAGE_WIDTH/2 - startButton.image.width/2;
 	startButton.y = startButtonHover.y = 350;
+	startButton.cursor = "pointer";
+	startButtonHover.cursor = "pointer";
 
 	stage.addChild(startButton);
 	startButton.on("mouseover", function() {
@@ -233,6 +236,7 @@ function initGraphics() {
 	questionText = new createjs.Text(questions[questionCounter].question, '36px Arial', "black");
 	square.x = 45;
 	square.y = 100;
+	square.cursor = "pointer";
 	questionText.x = square.x + square.image.width/2 - questionText.getMeasuredWidth()/2;
 	questionText.y = square.y + square.image.height/2 - questionText.getMeasuredHeight()/2;
 	stage.addChild(square);
@@ -284,14 +288,14 @@ function initRecycleListener() {
 		if (enabled) {
 			recycle.alpha = 0.8;
 			recycle.scaleX = recycle.scaleY = 1.05;
-			selected = "recycle";
+			selected = "neither";
 		}
 	});
 	recycle.on("rollout", function(event) {
 		recycle.alpha = 1;
 		recycle.scaleX = recycle.scaleY = 1;
 		selected = "none";
-	
+
 	});
 }
 
@@ -336,7 +340,7 @@ function initVennListeners() {
 
 		leftVenn.alpha = 1;
 		selected = "none";
-		
+
 	});
 	centerVenn.on("rollover", function() {
 		if (enabled) {
@@ -348,7 +352,7 @@ function initVennListeners() {
 
 		centerVenn.alpha = 1;
 		selected = "none";
-		
+
 	});
 	rightVenn.on("rollover", function() {
 		if (enabled) {
@@ -357,10 +361,10 @@ function initVennListeners() {
 		}
 	});
 	rightVenn.on("rollout", function() {
-			
+
 		rightVenn.alpha = 1;
 		selected = "none";
-		
+
 	});
 }
 
@@ -389,24 +393,7 @@ function dropHandler(event) {
 	if (selected != "none") {
 		clearInterval(questionTimer);
 
-
-		// determine correct answer
-		var correct;
-		let number = questions[questionCounter].question;
-		let left = questions[questionCounter].options[0];
-		let right = questions[questionCounter].options[1];
-
-		if (number % left == 0 && number % right == 0) {
-			correct = "both";
-		} else if (number % left == 0) {
-			correct = "left";
-		} else if (number % right == 0) {
-			correct = "right";
-		} else {
-			correct = "recycle";
-		}
-
-		if (selected === correct) {
+		if (selected === questions[questionCounter].answer) {
 
 			if (questionCounter == 10  || questionCounter == 20) {
 				nextLevel();
@@ -421,7 +408,7 @@ function dropHandler(event) {
 			removeLife();
 			playSound("wrongSound");
 		}
-	} 
+	}
 }
 
 function removeLife() {
@@ -481,6 +468,9 @@ function initMuteUnMuteButtons() {
 
 	muteButton.x = unmuteButton.x = 5;
 	muteButton.y = unmuteButton.y = 5;
+
+	muteButton.cursor = "pointer";
+	unmuteButton.cursor = "pointer";
 
 	muteButton.on("click", toggleMute);
 	unmuteButton.on("click", toggleMute);
@@ -603,7 +593,7 @@ function setupManifest() {
 
 function startPreload() {
 	preload = new createjs.LoadQueue(true);
-    preload.installPlugin(createjs.Sound);          
+    preload.installPlugin(createjs.Sound);
     preload.on("fileload", handleFileLoad);
     preload.on("progress", handleFileProgress);
     preload.on("complete", loadComplete);
