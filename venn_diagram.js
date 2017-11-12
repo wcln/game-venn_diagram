@@ -1,6 +1,6 @@
 /*
  * BC Learning Network (bclearningnetwork.com)
- * Divisibility Game
+ * Venn Diagram Game
  * @authors Colin Bernard and Brittany Miller
  */
 
