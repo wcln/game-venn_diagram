@@ -69,9 +69,6 @@ var levelText;
 var timerText;
 var startText;
 
-var customStartText = "Test text pls ignore";
-var questionsPerLevel = 10;
-
 
 
 

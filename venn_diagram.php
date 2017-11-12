@@ -11,6 +11,18 @@
 	<script src="lib/ndgmr.Collision.js"></script>
 	<script type="text/javascript" src="helper.js"></script><!-- contains helper functions which do not call functions in balloon.js -->
 	<script type="text/javascript" src="venn_diagram.js"></script><!-- the main game JS file -->
+
+	<script>
+		var questions = [];
+		var customStartText = "Test text pls ignore";
+		var questionsPerLevel = 10;
+
+		$.getJSON("versions/<?=_GET['title']?>.json", function(json) {
+				// TODO: initialize the above variables
+		});
+	</script>
+
+
 </head>
 <body onload="init();"><!-- body onload calls function to initialize game -->
 
