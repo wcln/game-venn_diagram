@@ -67,6 +67,10 @@ var leftVennText;
 var rightVennText;
 var levelText;
 var timerText;
+var startText;
+
+var customStartText = "Test text pls ignore";
+var questionsPerLevel = 10;
 
 
 
@@ -156,14 +160,25 @@ function endGame() {
 }
 
 /*
- * Starts the game. Called by preloadJS loadComplete
+ * Displays the start screen.
  */
 function startGame() {
+	stage.addChild(faded);
 
 	startButton.x = startButtonHover.x  = STAGE_WIDTH/2 - startButton.image.width/2;
 	startButton.y = startButtonHover.y = 350;
 	startButton.cursor = "pointer";
 	startButtonHover.cursor = "pointer";
+
+	startText = new createjs.Text(customStartText +
+		"\n\nYou have three lives. If you get a question wrong, you lose a heart. Each question is timed and if you do not answer quickly enough, you will also lose a heart! Work your way through all the levels!"
+		, '18px Sans', 'white');
+	startText.textAlign = 'center';
+	startText.lineWidth = 615;
+	startText.x = STAGE_WIDTH/2;
+	startText.y = 95;
+	stage.addChild(startText);
+
 
 	stage.addChild(startButton);
 	startButton.on("mouseover", function() {
@@ -222,8 +237,8 @@ function nextQuestion() {
  * Loads and positions graphics
  */
 function initGraphics() {
-	stage.addChild(background);
-	stage.removeChild(startBackground);
+	stage.removeChild(startText);
+	stage.removeChild(faded);
 	initMuteUnMuteButtons();
 
 	// draw the venn diagram
@@ -395,7 +410,7 @@ function dropHandler(event) {
 
 		if (selected === questions[questionCounter].answer) {
 
-			if (questionCounter == 10  || questionCounter == 20) {
+			if (questionCounter % questionsPerLevel == 0) {
 				nextLevel();
 			}
 
@@ -581,10 +596,6 @@ function setupManifest() {
 			id: "startButtonHover"
 		},
 		{
-			src: "images/startBackground.png",
-			id: "startBackground"
-		},
-		{
 			src: "images/faded.png",
 			id: "faded"
 		}
@@ -636,8 +647,6 @@ function handleFileLoad(event) {
    		playAgainButton = new createjs.Bitmap(event.result);
    	} else if (event.item.id == "playAgainButtonHover") {
    		playAgainButtonHover = new createjs.Bitmap(event.result);
-   	} else if (event.item.id == "startBackground") {
-   		startBackground = new createjs.Bitmap(event.result);
    	} else if (event.item.id == "faded") {
    		faded = new createjs.Bitmap(event.result);
    	}
@@ -659,10 +668,10 @@ function loadComplete(event) {
     console.log("Finished Loading Assets");
 
     // ticker calls update function, set the FPS
-	createjs.Ticker.setFPS(FPS);
-	createjs.Ticker.addEventListener("tick", update); // call update function
+		createjs.Ticker.setFPS(FPS);
+		createjs.Ticker.addEventListener("tick", update); // call update function
 
-	stage.addChild(startBackground);
+		stage.addChild(background);
     stage.update();
     startGame();
 }
