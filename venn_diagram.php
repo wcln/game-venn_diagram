@@ -15,12 +15,18 @@
 		var questionsPerLevel;
 		var customStartText;
 
-		$.getJSON("versions/<?=$_GET['title']?>/questions.json", function(questions_json) {
-				questions = questions_json;
-		});
-		$.getJSON("versions/<?=$_GET['title']?>/data.json", function(data_json) {
-				customStartText = data_json[0].startText;
-				questionsPerLevel = data_json[0].questionsPerLevel;
+		$.getJSON("versions/<?=$_GET['title']?>.json", function(json) {
+			console.log(json);
+
+			numquestions = json['numquestions'];
+			questionsPerLevel = json['questions_per_level'];
+			customStartText = json['description'];
+
+			for (var i = 0; i <= numquestions; i++) {
+				questions.push({question: json['q'+i], options: [json['o'+i+'0'], json['o'+i+'1']], answer: json['a'+i]});
+			}
+
+
 		});
 
 	</script>
