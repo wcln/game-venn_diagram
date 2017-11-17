@@ -1,6 +1,0 @@
-[
-  {
-    "questionsPerLevel": 10,
-    "startText": "A number will be given in a green square. If the number is divisible by only one of the numbers given, drag it to the correct side of the venn diagram. If it is divisible by both numbers, drop it in the center of the Venn diagram. If the number is not divisible by either numbers, place it in the recycle bin."
-  }
-]
