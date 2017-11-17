@@ -1,2 +1,2 @@
-# bcln-game-divisibility
+# bcln-game-venn_diagram
 BCLN Educational Game
