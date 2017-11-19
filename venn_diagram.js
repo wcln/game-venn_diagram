@@ -187,6 +187,8 @@ function nextQuestion() {
 			leftVennText.text = questions[questionCounter].options[0];
 			rightVennText.text = questions[questionCounter].options[1];
 
+			leftVennText.x = STAGE_WIDTH/2 - 80 - leftVennText.getMeasuredWidth();
+
 			questionText.x = square.x + square.image.width/2 - questionText.getMeasuredWidth()/2;
 			questionText.y = square.y + square.image.height/2 - questionText.getMeasuredHeight()/2;
 
