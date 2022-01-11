@@ -1,7 +1,7 @@
 /*
- * BC Learning Network (bclearningnetwork.com)
+ * BC Learning Network (wcln.ca)
  * Venn Diagram Game
- * @authors Colin Bernard and Brittany Miller
+ * @authors Colin Perepelken and Brittany Miller
  */
 
 
